@@ -1,6 +1,7 @@
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Dropout, Input
+from tensorflow.keras import backend as K
 import numpy as np
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 import pandas as pd
@@ -13,7 +14,8 @@ class SalesForecaster:
     def __init__(self, config, mlflow_manager=None):
         self.config = config
         self.mlflow_manager = mlflow_manager
-        self.model = self._build_model()
+        with K.name_scope('model'):  # Add name scope context
+            self.model = self._build_model()
         
     def _build_model(self):
         # Input layer

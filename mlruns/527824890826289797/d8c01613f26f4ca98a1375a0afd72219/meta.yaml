@@ -1,0 +1,15 @@
+artifact_uri: file:///app/mlruns/527824890826289797/d8c01613f26f4ca98a1375a0afd72219/artifacts
+end_time: 1738588425437
+entry_point_name: ''
+experiment_id: '527824890826289797'
+lifecycle_stage: active
+run_id: d8c01613f26f4ca98a1375a0afd72219
+run_name: monumental-crane-100
+run_uuid: d8c01613f26f4ca98a1375a0afd72219
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1738588352088
+status: 3
+tags: []
+user_id: appuser

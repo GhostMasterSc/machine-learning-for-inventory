@@ -6,6 +6,7 @@ import numpy as np
 import mlflow
 from mlflow.tracking import MlflowClient
 import json
+from tensorflow.keras import backend as K
 
 class InventoryDashboard:
     def __init__(self, forecaster, optimizer, data_processor, data, mlflow_manager):
@@ -228,7 +229,6 @@ class InventoryDashboard:
             
             if st.button("Update Model Architecture"):
                 self.forecaster.model = self.forecaster._build_model()
-                st.success("Model architecture updated!")
         
         # Training Section
         with st.expander("Training", expanded=True):
@@ -244,7 +244,8 @@ class InventoryDashboard:
                 })
                 
                 # Rebuild model with new config
-                self.forecaster.model = self.forecaster._build_model()
+                with K.name_scope('model'):  # Add name scope context
+                    self.forecaster.model = self.forecaster._build_model()
                 
                 with st.spinner("Training the forecasting model..."):
                     history = self.forecaster.train(

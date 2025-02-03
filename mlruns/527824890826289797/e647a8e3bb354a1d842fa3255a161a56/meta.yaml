@@ -1,0 +1,16 @@
+artifact_uri: file:///app/mlruns/527824890826289797/e647a8e3bb354a1d842fa3255a161a56/artifacts
+deleted_time: 1738584789542
+end_time: 1738584312277
+entry_point_name: ''
+experiment_id: '527824890826289797'
+lifecycle_stage: deleted
+run_id: e647a8e3bb354a1d842fa3255a161a56
+run_name: suave-asp-157
+run_uuid: e647a8e3bb354a1d842fa3255a161a56
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1738584290640
+status: 3
+tags: []
+user_id: appuser

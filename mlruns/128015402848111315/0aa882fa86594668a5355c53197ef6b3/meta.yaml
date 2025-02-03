@@ -1,0 +1,16 @@
+artifact_uri: file:///app/mlruns/128015402848111315/0aa882fa86594668a5355c53197ef6b3/artifacts
+deleted_time: 1738583832618
+end_time: 1738583832602
+entry_point_name: ''
+experiment_id: '128015402848111315'
+lifecycle_stage: deleted
+run_id: 0aa882fa86594668a5355c53197ef6b3
+run_name: intrigued-moose-10
+run_uuid: 0aa882fa86594668a5355c53197ef6b3
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1738583832589
+status: 3
+tags: []
+user_id: appuser

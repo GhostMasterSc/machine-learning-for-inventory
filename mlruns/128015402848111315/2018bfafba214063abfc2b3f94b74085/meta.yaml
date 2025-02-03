@@ -1,0 +1,16 @@
+artifact_uri: file:///app/mlruns/128015402848111315/2018bfafba214063abfc2b3f94b74085/artifacts
+deleted_time: 1738585206789
+end_time: 1738585206763
+entry_point_name: ''
+experiment_id: '128015402848111315'
+lifecycle_stage: deleted
+run_id: 2018bfafba214063abfc2b3f94b74085
+run_name: enchanting-wolf-426
+run_uuid: 2018bfafba214063abfc2b3f94b74085
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1738585206748
+status: 3
+tags: []
+user_id: appuser

@@ -1,0 +1,15 @@
+artifact_uri: file:///app/mlruns/527824890826289797/4b059bdb40aa482580f629fc4bfeaf73/artifacts
+end_time: 1738585411391
+entry_point_name: ''
+experiment_id: '527824890826289797'
+lifecycle_stage: active
+run_id: 4b059bdb40aa482580f629fc4bfeaf73
+run_name: lyrical-whale-661
+run_uuid: 4b059bdb40aa482580f629fc4bfeaf73
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1738585386670
+status: 3
+tags: []
+user_id: appuser

@@ -1,0 +1,6 @@
+artifact_location: file:///app/mlruns/527824890826289797
+creation_time: 1738583948096
+experiment_id: '527824890826289797'
+last_update_time: 1738583948096
+lifecycle_stage: active
+name: inventory_forecasting

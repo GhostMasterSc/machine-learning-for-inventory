@@ -11,7 +11,7 @@ def main():
     data = generate_sample_data()
     
     # Initialize MLflow
-    mlflow_manager = MLflowManager()
+    mlflow_manager = MLflowManager("inventory_forecasting")
     
     # Initialize components
     data_processor = DataProcessor(config.LSTM_PARAMS['sequence_length'])

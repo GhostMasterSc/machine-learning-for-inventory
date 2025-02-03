@@ -1,0 +1,15 @@
+artifact_uri: file:///app/mlruns/527824890826289797/c23b5057dcc44b44aa0977e8eafb0354/artifacts
+end_time: 1738585460385
+entry_point_name: ''
+experiment_id: '527824890826289797'
+lifecycle_stage: active
+run_id: c23b5057dcc44b44aa0977e8eafb0354
+run_name: wistful-goose-313
+run_uuid: c23b5057dcc44b44aa0977e8eafb0354
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1738585437812
+status: 3
+tags: []
+user_id: appuser

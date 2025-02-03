@@ -6,11 +6,10 @@ channels:
   - defaults
 dependencies:
   - python=3.9
-  - pytorch=2.0.1
-  - pytorch-cuda=11.7
-  - cudatoolkit=11.7
+  - pytorch
   - torchvision
   - torchaudio
+  - cudatoolkit=11.8
   - numpy
   - pandas
   - mlflow
@@ -24,7 +23,5 @@ dependencies:
   - scikit-learn>=1.0.0
   - streamlit>=1.10.0
   - plotly>=5.7.0
-  - pytorch::pytorch=2.0.0
-  - pytorch::torchvision=0.15.0
   - pip:
     - mlflow>=2.3.0 

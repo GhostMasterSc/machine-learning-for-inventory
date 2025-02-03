@@ -9,14 +9,15 @@ MODELS_DIR = BASE_DIR / "models"
 LSTM_PARAMS = {
     "sequence_length": 30,
     "n_features": 4,
-    "hidden_units": 64,
+    "hidden_units": 128,
     "dropout_rate": 0.2,
     "learning_rate": 0.001,
     "batch_size": 32,
     "epochs": 100,
     "input_shape": (30, 4),  # (sequence_length, n_features)
     "num_lstm_layers": 2,  # Number of LSTM layers
-    "hidden_units_decay": 0.5  # Factor to reduce hidden units in deeper layers
+    "hidden_units_decay": 0.75,  # Factor to reduce hidden units in deeper layers
+    "patience": 20  # Early stopping patience
 }
 
 DRL_PARAMS = {

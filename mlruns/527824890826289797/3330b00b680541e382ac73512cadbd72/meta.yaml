@@ -1,0 +1,16 @@
+artifact_uri: file:///app/mlruns/527824890826289797/3330b00b680541e382ac73512cadbd72/artifacts
+deleted_time: 1738584789551
+end_time: 1738583973522
+entry_point_name: ''
+experiment_id: '527824890826289797'
+lifecycle_stage: deleted
+run_id: 3330b00b680541e382ac73512cadbd72
+run_name: delicate-bird-582
+run_uuid: 3330b00b680541e382ac73512cadbd72
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1738583973406
+status: 4
+tags: []
+user_id: appuser

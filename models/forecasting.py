@@ -1,11 +1,13 @@
 import tensorflow as tf
 from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import LSTM, Dense, Dropout
+from tensorflow.keras.layers import LSTM, Dense, Dropout, Input
 import numpy as np
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 import pandas as pd
 import mlflow
 import plotly.graph_objects as go
+import tempfile
+import os
 
 class SalesForecaster:
     def __init__(self, config, mlflow_manager=None):
@@ -14,33 +16,35 @@ class SalesForecaster:
         self.model = self._build_model()
         
     def _build_model(self):
-        layers = []
+        # Input layer
+        inputs = Input(shape=self.config["input_shape"])
+        x = inputs
         
         # First LSTM layer
-        layers.append(LSTM(
+        x = LSTM(
             self.config["hidden_units"],
-            input_shape=self.config["input_shape"],
             return_sequences=self.config["num_lstm_layers"] > 1
-        ))
-        layers.append(Dropout(self.config["dropout_rate"]))
+        )(x)
+        x = Dropout(self.config["dropout_rate"])(x)
         
         # Middle LSTM layers
         for i in range(1, self.config["num_lstm_layers"] - 1):
-            hidden_units = int(self.config["hidden_units"] * (self.config["hidden_units_decay"] ** i))
-            layers.append(LSTM(hidden_units, return_sequences=True))
-            layers.append(Dropout(self.config["dropout_rate"]))
+            hidden_units = max(16, int(self.config["hidden_units"] * (self.config["hidden_units_decay"] ** i)))
+            x = LSTM(hidden_units, return_sequences=True)(x)
+            x = Dropout(self.config["dropout_rate"])(x)
         
         # Last LSTM layer (if more than one layer)
         if self.config["num_lstm_layers"] > 1:
-            hidden_units = int(self.config["hidden_units"] * 
-                             (self.config["hidden_units_decay"] ** (self.config["num_lstm_layers"] - 1)))
-            layers.append(LSTM(hidden_units))
-            layers.append(Dropout(self.config["dropout_rate"]))
+            hidden_units = max(16, int(self.config["hidden_units"] * 
+                             (self.config["hidden_units_decay"] ** (self.config["num_lstm_layers"] - 1))))
+            x = LSTM(hidden_units)(x)
+            x = Dropout(self.config["dropout_rate"])(x)
         
         # Output layer
-        layers.append(Dense(1))
+        outputs = Dense(1)(x)
         
-        model = Sequential(layers)
+        # Create model
+        model = tf.keras.Model(inputs=inputs, outputs=outputs)
         
         model.compile(optimizer=tf.keras.optimizers.Adam(learning_rate=self.config["learning_rate"]),
                      loss='mse',
@@ -71,9 +75,11 @@ class SalesForecaster:
                 # Log model summary as text artifact
                 model_summary = []
                 self.model.summary(print_fn=lambda x: model_summary.append(x))
-                with open("model_summary.txt", "w") as f:
+                with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.txt') as f:
                     f.write("\n".join(model_summary))
-                mlflow.log_artifact("model_summary.txt")
+                    summary_path = f.name
+                mlflow.log_artifact(summary_path)
+                os.unlink(summary_path)  # Clean up the temporary file
 
         history = self.model.fit(
             X_train, y_train,
@@ -81,7 +87,12 @@ class SalesForecaster:
             batch_size=self.config["batch_size"],
             epochs=self.config["epochs"],
             callbacks=[
-                tf.keras.callbacks.EarlyStopping(patience=10, restore_best_weights=True),
+                tf.keras.callbacks.EarlyStopping(
+                    patience=self.config.get("patience", 20),
+                    restore_best_weights=True,
+                    monitor='val_loss',
+                    mode='min'
+                ),
                 MLflowCallback()
             ]
         )
@@ -92,12 +103,14 @@ class SalesForecaster:
         mlflow.log_metrics(val_metrics)
         self.mlflow_manager.log_model(self.model, X_sample=X_train[:1], y_sample=y_train[:1])
         
-        # Log training history plot
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(y=history.history['loss'], name='Train Loss'))
-        fig.add_trace(go.Scatter(y=history.history['val_loss'], name='Val Loss'))
-        fig.write_html("training_history.html")
-        mlflow.log_artifact("training_history.html")
+        # Log training history plot using tempfile
+        with tempfile.NamedTemporaryFile(mode='w', delete=False, suffix='.html') as f:
+            fig = go.Figure()
+            fig.add_trace(go.Scatter(y=history.history['loss'], name='Train Loss'))
+            fig.add_trace(go.Scatter(y=history.history['val_loss'], name='Val Loss'))
+            fig.write_html(f.name)
+            mlflow.log_artifact(f.name)
+            os.unlink(f.name)  # Clean up the temporary file
         
         return history
     
@@ -108,7 +121,12 @@ class SalesForecaster:
             batch_size=self.config["batch_size"],
             epochs=self.config["epochs"],
             callbacks=[
-                tf.keras.callbacks.EarlyStopping(patience=10, restore_best_weights=True)
+                tf.keras.callbacks.EarlyStopping(
+                    patience=self.config.get("patience", 20),
+                    restore_best_weights=True,
+                    monitor='val_loss',
+                    mode='min'
+                )
             ]
         )
     
@@ -120,6 +138,6 @@ class SalesForecaster:
         metrics = {
             'rmse': np.sqrt(mean_squared_error(y_test, y_pred)),
             'mae': mean_absolute_error(y_test, y_pred),
-            'mape': np.mean(np.abs((y_test - y_pred) / y_test)) * 100
+            'mape': np.mean(np.abs((y_test - y_pred) / (y_test + 1e-7))) * 100  # Add small constant to avoid division by zero
         }
         return metrics 

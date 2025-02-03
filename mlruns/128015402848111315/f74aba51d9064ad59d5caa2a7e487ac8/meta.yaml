@@ -1,0 +1,16 @@
+artifact_uri: file:///app/mlruns/128015402848111315/f74aba51d9064ad59d5caa2a7e487ac8/artifacts
+deleted_time: 1738585790726
+end_time: 1738585790665
+entry_point_name: ''
+experiment_id: '128015402848111315'
+lifecycle_stage: deleted
+run_id: f74aba51d9064ad59d5caa2a7e487ac8
+run_name: angry-ape-23
+run_uuid: f74aba51d9064ad59d5caa2a7e487ac8
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1738585790647
+status: 3
+tags: []
+user_id: appuser

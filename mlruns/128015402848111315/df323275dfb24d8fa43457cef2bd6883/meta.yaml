@@ -1,0 +1,16 @@
+artifact_uri: file:///app/mlruns/128015402848111315/df323275dfb24d8fa43457cef2bd6883/artifacts
+deleted_time: 1738585360795
+end_time: 1738585360740
+entry_point_name: ''
+experiment_id: '128015402848111315'
+lifecycle_stage: deleted
+run_id: df323275dfb24d8fa43457cef2bd6883
+run_name: luxuriant-goose-222
+run_uuid: df323275dfb24d8fa43457cef2bd6883
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1738585360722
+status: 3
+tags: []
+user_id: appuser

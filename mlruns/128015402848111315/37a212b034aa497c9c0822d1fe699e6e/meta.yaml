@@ -1,0 +1,16 @@
+artifact_uri: file:///app/mlruns/128015402848111315/37a212b034aa497c9c0822d1fe699e6e/artifacts
+deleted_time: 1738583832581
+end_time: 1738583832534
+entry_point_name: ''
+experiment_id: '128015402848111315'
+lifecycle_stage: deleted
+run_id: 37a212b034aa497c9c0822d1fe699e6e
+run_name: crawling-whale-876
+run_uuid: 37a212b034aa497c9c0822d1fe699e6e
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1738583832514
+status: 3
+tags: []
+user_id: appuser

@@ -1,0 +1,15 @@
+artifact_uri: file:///app/mlruns/527824890826289797/04c059f31abf4533924f0a2f9cbb4f8f/artifacts
+end_time: 1738586290868
+entry_point_name: ''
+experiment_id: '527824890826289797'
+lifecycle_stage: active
+run_id: 04c059f31abf4533924f0a2f9cbb4f8f
+run_name: luminous-goat-256
+run_uuid: 04c059f31abf4533924f0a2f9cbb4f8f
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1738586238218
+status: 3
+tags: []
+user_id: appuser

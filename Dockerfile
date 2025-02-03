@@ -20,23 +20,22 @@ WORKDIR /app
 COPY environment.yml .
 
 # Create conda environment and install dependencies
-RUN conda config --set remote_read_timeout_secs 600 && \
-    for i in $(seq 1 3); do \
-        echo "Attempt $i of 3"; \
-        conda env create -f environment.yml && \
-        conda clean -afy && \
-        break || \
-        if [ $i -lt 3 ]; then \
-            echo "Retrying..."; \
-            sleep 15; \
-        fi; \
-    done
+RUN conda env create -f environment.yml && \
+    echo "conda activate inventory-env" >> ~/.bashrc && \
+    conda init bash
 
-# Now that the environment is created, continue with OS-level commands
-# (Do not switch SHELL; keep default /bin/bash for build commands)
+# Make RUN commands use the new environment
+SHELL ["/bin/bash", "--login", "-c"]
 
 # Create non-root user for better security
 RUN useradd -m appuser
+
+# Set up conda for the non-root user
+COPY --chown=appuser:appuser environment.yml /home/appuser/
+RUN mkdir -p /home/appuser/.conda && \
+    chown -R appuser:appuser /home/appuser/.conda && \
+    conda init bash && \
+    echo "conda activate inventory-env" >> /home/appuser/.bashrc
 
 # Copy application code
 COPY . .
@@ -51,9 +50,10 @@ RUN chown -R appuser:appuser /app && \
 
 # Switch to non-root user
 USER appuser
+SHELL ["/bin/bash", "--login", "-c"]
 
 # Expose the port for the service
 EXPOSE 8501
 
-# At runtime, ensure the conda environment is used
-CMD ["conda", "run", "--no-capture-output", "-n", "inventory-env", "./start.sh"] 
+# Run the application with conda environment activated
+CMD ["/bin/bash", "-c", "source /opt/conda/etc/profile.d/conda.sh && conda activate inventory-env && ./start.sh"] 

@@ -1,0 +1,16 @@
+artifact_uri: file:///app/mlruns/128015402848111315/3695a0b97bc548e6bb0a2041a5fe3e0d/artifacts
+deleted_time: 1738584283050
+end_time: 1738584283032
+entry_point_name: ''
+experiment_id: '128015402848111315'
+lifecycle_stage: deleted
+run_id: 3695a0b97bc548e6bb0a2041a5fe3e0d
+run_name: redolent-panda-829
+run_uuid: 3695a0b97bc548e6bb0a2041a5fe3e0d
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1738584283018
+status: 3
+tags: []
+user_id: appuser

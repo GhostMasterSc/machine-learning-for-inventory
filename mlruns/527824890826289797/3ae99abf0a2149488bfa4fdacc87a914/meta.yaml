@@ -1,0 +1,16 @@
+artifact_uri: file:///app/mlruns/527824890826289797/3ae99abf0a2149488bfa4fdacc87a914/artifacts
+deleted_time: 1738584789546
+end_time: 1738584146343
+entry_point_name: ''
+experiment_id: '527824890826289797'
+lifecycle_stage: deleted
+run_id: 3ae99abf0a2149488bfa4fdacc87a914
+run_name: amusing-crane-566
+run_uuid: 3ae99abf0a2149488bfa4fdacc87a914
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1738584131209
+status: 4
+tags: []
+user_id: appuser

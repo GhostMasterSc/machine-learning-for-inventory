@@ -1,0 +1,27 @@
+artifact_path: model
+flavors:
+  python_function:
+    data: data
+    env:
+      conda: conda.yaml
+      virtualenv: python_env.yaml
+    loader_module: mlflow.tensorflow
+    python_version: 3.9.21
+  tensorflow:
+    code: null
+    data: data
+    keras_version: 2.17.0
+    model_type: keras
+    save_format: tf
+is_signature_from_type_hint: false
+mlflow_version: 2.20.1
+model_size_bytes: 2486571
+model_uuid: 51f5ccc12eef4b088519b7a3db55a27e
+run_id: 815ffa2d37454075953c3ae3fa674c48
+signature:
+  inputs: '[{"type": "tensor", "tensor-spec": {"dtype": "float64", "shape": [-1, 30,
+    4]}}]'
+  outputs: '[{"type": "tensor", "tensor-spec": {"dtype": "float64", "shape": [-1]}}]'
+  params: null
+type_hint_from_example: false
+utc_time_created: '2025-02-03 12:26:31.191733'

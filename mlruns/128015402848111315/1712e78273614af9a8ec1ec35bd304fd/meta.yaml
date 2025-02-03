@@ -1,0 +1,16 @@
+artifact_uri: file:///app/mlruns/128015402848111315/1712e78273614af9a8ec1ec35bd304fd/artifacts
+deleted_time: 1738585360844
+end_time: 1738585360819
+entry_point_name: ''
+experiment_id: '128015402848111315'
+lifecycle_stage: deleted
+run_id: 1712e78273614af9a8ec1ec35bd304fd
+run_name: rare-bass-722
+run_uuid: 1712e78273614af9a8ec1ec35bd304fd
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1738585360804
+status: 3
+tags: []
+user_id: appuser

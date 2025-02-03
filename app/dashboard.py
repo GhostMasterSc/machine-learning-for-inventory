@@ -15,6 +15,8 @@ class InventoryDashboard:
         self.data = data
         self.mlflow_manager = mlflow_manager
         self.client = MlflowClient()
+        # Initialize config from forecaster's config
+        self.config = self.forecaster.config.copy()
         self._prepare_data()
         
     def _prepare_data(self):
@@ -166,80 +168,121 @@ class InventoryDashboard:
             fig.update_layout(title=f"{selected_metric.upper()} History")
             st.plotly_chart(fig)
         
-        # Model configuration
-        st.subheader("Model Configuration")
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            epochs = st.number_input("Number of Epochs", min_value=10, max_value=1000, value=100)
-            batch_size = st.number_input("Batch Size", min_value=8, max_value=128, value=32)
-        with col2:
-            hidden_units = st.number_input("Hidden Units", min_value=16, max_value=256, value=64)
-            learning_rate = st.number_input("Learning Rate", min_value=0.0001, max_value=0.1, value=0.001, format="%.4f")
-        with col3:
-            num_lstm_layers = st.number_input("Number of LSTM Layers", min_value=1, max_value=5, value=2)
-            hidden_units_decay = st.number_input("Hidden Units Decay", min_value=0.1, max_value=1.0, value=0.5, format="%.2f")
-        
-        # Load best model
-        if runs and st.button("Load Best Model"):
-            best_run = min(runs, key=lambda run: run.data.metrics.get('rmse', float('inf')))
-            st.write(f"Loading model from run {best_run.info.run_id}")
-            model_uri = f"runs:/{best_run.info.run_id}/model"
-            self.forecaster.model = mlflow.tensorflow.load_model(model_uri)
-            st.success("Model loaded successfully!")
-        
-        # Update model config
-        if st.button("Update Configuration"):
-            self.forecaster.config.update({
-                "epochs": epochs,
-                "batch_size": batch_size,
-                "hidden_units": hidden_units,
-                "learning_rate": learning_rate,
-                "num_lstm_layers": num_lstm_layers,
-                "hidden_units_decay": hidden_units_decay
-            })
-            self.forecaster.model = self.forecaster._build_model()
-            st.success("Configuration updated!")
-        
-        if st.button("Train Model"):
-            with st.spinner("Training the forecasting model..."):
-                history = self.forecaster.train(
-                    self.X_train, self.y_train,
-                    self.X_val, self.y_val
+        # Model Configuration Section
+        with st.expander("Model Configuration"):
+            col1, col2, col3 = st.columns(3)
+            
+            with col1:
+                self.config["hidden_units"] = st.number_input(
+                    "Hidden Units",
+                    min_value=16,
+                    max_value=512,
+                    value=self.config["hidden_units"],
+                    step=16
+                )
+                self.config["batch_size"] = st.number_input(
+                    "Batch Size",
+                    min_value=8,
+                    max_value=128,
+                    value=self.config["batch_size"],
+                    step=8
+                )
+                self.config["patience"] = st.number_input(
+                    "Early Stopping Patience",
+                    min_value=5,
+                    max_value=50,
+                    value=self.config.get("patience", 20),
+                    step=5
                 )
                 
-                # Make predictions
-                y_pred = self.forecaster.predict(self.X_test)
-                metrics = self.forecaster.evaluate(self.X_test, self.y_test)
+            with col2:
+                self.config["num_lstm_layers"] = st.number_input(
+                    "Number of LSTM Layers",
+                    min_value=1,
+                    max_value=5,
+                    value=self.config["num_lstm_layers"]
+                )
+                self.config["dropout_rate"] = st.slider(
+                    "Dropout Rate",
+                    min_value=0.0,
+                    max_value=0.5,
+                    value=self.config["dropout_rate"],
+                    step=0.1
+                )
                 
-                # Log metrics to MLflow
-                if self.mlflow_manager:
-                    with self.mlflow_manager.start_run():
-                        self.mlflow_manager.log_metrics(metrics)
-                st.success("Training completed!")
+            with col3:
+                self.config["learning_rate"] = st.number_input(
+                    "Learning Rate",
+                    min_value=0.0001,
+                    max_value=0.01,
+                    value=self.config["learning_rate"],
+                    format="%.4f"
+                )
+                self.config["hidden_units_decay"] = st.slider(
+                    "Hidden Units Decay",
+                    min_value=0.1,
+                    max_value=1.0,
+                    value=self.config["hidden_units_decay"],
+                    step=0.05
+                )
+            
+            if st.button("Update Model Architecture"):
+                self.forecaster.model = self.forecaster._build_model()
+                st.success("Model architecture updated!")
         
-        # Actual vs Predicted plot
-        fig = go.Figure()
-        fig.add_trace(go.Scatter(
-            name="Actual",
-            y=self.data_processor.inverse_transform(self.y_test, 'sales').flatten(),
-            mode="lines"
-        ))
-        if 'y_pred' in locals():
+        # Training Section
+        with st.expander("Training", expanded=True):
+            if st.button("Train Model"):
+                # Update forecaster config with current UI values
+                self.forecaster.config.update({
+                    "hidden_units": self.config["hidden_units"],
+                    "batch_size": self.config["batch_size"],
+                    "num_lstm_layers": self.config["num_lstm_layers"],
+                    "dropout_rate": self.config["dropout_rate"],
+                    "learning_rate": self.config["learning_rate"],
+                    "hidden_units_decay": self.config["hidden_units_decay"]
+                })
+                
+                # Rebuild model with new config
+                self.forecaster.model = self.forecaster._build_model()
+                
+                with st.spinner("Training the forecasting model..."):
+                    history = self.forecaster.train(
+                        self.X_train, self.y_train,
+                        self.X_val, self.y_val
+                    )
+                    
+                    # Make predictions
+                    y_pred = self.forecaster.predict(self.X_test)
+                    metrics = self.forecaster.evaluate(self.X_test, self.y_test)
+                    st.success("Training completed!")
+        
+        # Results Section
+        with st.expander("Results", expanded=True):
+            # Actual vs Predicted plot
+            fig = go.Figure()
             fig.add_trace(go.Scatter(
-                name="Predicted",
-                y=self.data_processor.inverse_transform(y_pred, 'sales').flatten(),
+                name="Actual",
+                y=self.data_processor.inverse_transform(self.y_test, 'sales').flatten(),
                 mode="lines"
             ))
-        st.plotly_chart(fig)
-        
-        # Metrics
-        col1, col2, col3 = st.columns(3)
-        with col1:
-            st.metric("RMSE", f"{metrics['rmse']:.2f}" if 'metrics' in locals() else "0.0")
-        with col2:
-            st.metric("MAE", f"{metrics['mae']:.2f}" if 'metrics' in locals() else "0.0")
-        with col3:
-            st.metric("MAPE", f"{metrics['mape']:.2f}%" if 'metrics' in locals() else "0.0%")
+            if 'y_pred' in locals():
+                fig.add_trace(go.Scatter(
+                    name="Predicted",
+                    y=self.data_processor.inverse_transform(y_pred, 'sales').flatten(),
+                    mode="lines"
+                ))
+            st.plotly_chart(fig)
+            
+            # Metrics
+            if 'metrics' in locals():
+                col1, col2, col3 = st.columns(3)
+                with col1:
+                    st.metric("RMSE", f"{metrics['rmse']:.2f}")
+                with col2:
+                    st.metric("MAE", f"{metrics['mae']:.2f}")
+                with col3:
+                    st.metric("MAPE", f"{metrics['mape']:.2f}%")
     
     def _show_inventory_optimization(self):
         st.header("Inventory Optimization")

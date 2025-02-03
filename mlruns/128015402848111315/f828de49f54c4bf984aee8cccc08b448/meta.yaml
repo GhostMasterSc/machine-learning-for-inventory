@@ -1,0 +1,16 @@
+artifact_uri: file:///app/mlruns/128015402848111315/f828de49f54c4bf984aee8cccc08b448/artifacts
+deleted_time: 1738584101622
+end_time: 1738584101581
+entry_point_name: ''
+experiment_id: '128015402848111315'
+lifecycle_stage: deleted
+run_id: f828de49f54c4bf984aee8cccc08b448
+run_name: trusting-gnat-803
+run_uuid: f828de49f54c4bf984aee8cccc08b448
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1738584101565
+status: 3
+tags: []
+user_id: appuser

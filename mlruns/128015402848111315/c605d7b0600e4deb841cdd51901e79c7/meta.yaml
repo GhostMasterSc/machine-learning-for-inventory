@@ -1,0 +1,16 @@
+artifact_uri: file:///app/mlruns/128015402848111315/c605d7b0600e4deb841cdd51901e79c7/artifacts
+deleted_time: 1738572221688
+end_time: 1738572221652
+entry_point_name: ''
+experiment_id: '128015402848111315'
+lifecycle_stage: deleted
+run_id: c605d7b0600e4deb841cdd51901e79c7
+run_name: crawling-dog-450
+run_uuid: c605d7b0600e4deb841cdd51901e79c7
+source_name: ''
+source_type: 4
+source_version: ''
+start_time: 1738572221638
+status: 3
+tags: []
+user_id: appuser

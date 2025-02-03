@@ -1,0 +1,30 @@
+name: inventory-env
+channels:
+  - pytorch
+  - nvidia
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - pytorch=2.0.1
+  - pytorch-cuda=11.7
+  - cudatoolkit=11.7
+  - torchvision
+  - torchaudio
+  - numpy
+  - pandas
+  - mlflow
+  - pytest
+  - pip
+  - pip:
+    - scikit-learn
+    - gymnasium
+  - tensorflow>=2.8.0
+  - cudnn=8.2
+  - scikit-learn>=1.0.0
+  - streamlit>=1.10.0
+  - plotly>=5.7.0
+  - pytorch::pytorch=2.0.0
+  - pytorch::torchvision=0.15.0
+  - pip:
+    - mlflow>=2.3.0 

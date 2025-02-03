@@ -1,0 +1,54 @@
+version: '3'
+services:
+  inventory-app:
+    build: .
+    restart: always
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app
+      - mlruns_data:/app/mlruns
+    environment:
+      - PYTHONPATH=/app
+      - CONDA_DEFAULT_ENV=inventory-env
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8501"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  tests:
+    build: .
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: 1
+              capabilities: [gpu]
+    volumes:
+      - .:/app
+      - mlruns_data:/app/mlruns
+    environment:
+      - PYTHONPATH=/app
+      - TESTING=true
+      - CONDA_DEFAULT_ENV=inventory-env
+    command: conda run --no-capture-output -n inventory-env python run_tests.py
+
+volumes:
+  mlruns_data:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: "${PWD}/mlruns"
+    # Remove any existing .trash directory
+    name: mlruns_data
+    # Ensure directory exists by running: mkdir -p "${PWD}/mlruns" 

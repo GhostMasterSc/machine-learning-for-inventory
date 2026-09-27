@@ -1,15 +1,7 @@
-version: '3'
 services:
   inventory-app:
     build: .
     restart: always
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
     ports:
       - "8501:8501"
     volumes:
@@ -19,20 +11,14 @@ services:
       - PYTHONPATH=/app
       - CONDA_DEFAULT_ENV=inventory-env
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8501"]
+      test: ["CMD", "curl", "-f", "http://localhost:8501/_stcore/health"]
       interval: 30s
       timeout: 10s
       retries: 3
+      start_period: 40s
 
   tests:
     build: .
-    deploy:
-      resources:
-        reservations:
-          devices:
-            - driver: nvidia
-              count: 1
-              capabilities: [gpu]
     volumes:
       - .:/app
       - mlruns_data:/app/mlruns
@@ -42,13 +28,9 @@ services:
       - CONDA_DEFAULT_ENV=inventory-env
     command: conda run --no-capture-output -n inventory-env python run_tests.py
 
+# mlruns_data is a Docker-managed named volume, so MLflow experiment history
+# persists across runs without depending on a host directory. To run on an
+# NVIDIA GPU, add a `deploy.resources.reservations.devices` block requesting
+# the gpu capability to a service (requires the NVIDIA Container Toolkit).
 volumes:
   mlruns_data:
-    driver: local
-    driver_opts:
-      type: none
-      o: bind
-      device: "${PWD}/mlruns"
-    # Remove any existing .trash directory
-    name: mlruns_data
-    # Ensure directory exists by running: mkdir -p "${PWD}/mlruns" 

@@ -24,7 +24,10 @@ def main():
     )
     
     # Initialize dashboard
-    dashboard = InventoryDashboard(forecaster, drl_agent, data_processor, data, mlflow_manager)
+    dashboard = InventoryDashboard(
+        forecaster, drl_agent, data_processor, data, mlflow_manager,
+        base_stock=base_stock_policy,
+    )
     
     # Run the application
     dashboard.run()

@@ -1,1 +1,30 @@
-packages/
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.Python
+build/
+dist/
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+
+# ML experiment tracking & artifacts (regenerated locally)
+mlruns/
+mlartifacts/
+models/*.h5
+models/*.keras
+models/*.pt
+models/*.pth
+
+# Generated reports / plots
+training_history.html
+*.log
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

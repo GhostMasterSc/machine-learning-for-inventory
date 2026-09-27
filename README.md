@@ -15,7 +15,6 @@ An advanced inventory management system that leverages deep learning for sales f
 - [Performance](#-performance)
 - [Contributing](#-contributing)
 - [License](#-license)
-- [Contact](#-contact)
 - [Acknowledgments](#-acknowledgments)
 
 ## 🌟 Key Features
@@ -33,10 +32,11 @@ An advanced inventory management system that leverages deep learning for sales f
 - **Performance Visualization**: Interactive metric plots
 
 ### Inventory Optimization
-- **Deep Reinforcement Learning**: Advanced DRL agent for inventory decisions
-- **Base Stock Policy**: Traditional inventory management baseline
-- **Cost Analysis**: Detailed breakdown of holding, stockout, and ordering costs
-- **Performance Comparison**: DRL vs Base Stock policy evaluation
+- **Periodic-review simulation**: Lead-time-aware inventory engine that turns a demand series into inventory levels, orders and costs
+- **Base Stock Policy**: Constant order-up-to level with service-level-driven safety stock
+- **Forecast-driven Policy**: Order-up-to level that adapts to expected demand over the lead time
+- **Cost Analysis**: Detailed breakdown of holding, stockout, and ordering costs, with side-by-side policy comparison
+- **Deep Reinforcement Learning**: An optional DRL agent (PyTorch) is included for experimentation
 
 ## 🚀 Quick Start
 
@@ -47,8 +47,8 @@ An advanced inventory management system that leverages deep learning for sales f
 
 ### Installation
 Clone the repository:
-git clone https://github.com/yourusername/inventory-management-ml.git
-cd inventory-management-ml
+git clone https://github.com/GhostMasterSc/machine-learning-for-inventory.git
+cd machine-learning-for-inventory
 
 Build and run with Docker:
 docker-compose up --build
@@ -68,19 +68,23 @@ The system consists of interconnected components:
 ## 📁 Project Structure
 
 inventory-management-ml/
-├── app/                    # Dashboard and UI components
-│   ├── dashboard.py       # Main Streamlit interface
-│   └── components/        # Reusable UI components
-├── models/                # ML model implementations
-│   ├── forecasting.py    # LSTM sales forecaster
-│   └── optimization.py   # DRL inventory optimizer
-├── utils/                # Helper functions
-│   ├── data_processor.py # Data preprocessing
-│   └── mlflow_manager.py # MLflow utilities
-├── tests/               # Unit tests
-├── config.py           # System configuration
-├── docker-compose.yml  # Docker configuration
-└── README.md          # Documentation
+├── app/                       # Dashboard and UI
+│   ├── dashboard.py          # Streamlit interface (3 tabs)
+│   └── theme.py              # Shared palette, Plotly template & CSS
+├── models/                    # ML model implementations
+│   ├── forecasting.py        # LSTM sales forecaster
+│   └── optimization.py       # DRL agent + base-stock policy
+├── utils/                     # Helper functions
+│   ├── data_generator.py     # Synthetic demand generator
+│   ├── data_processor.py     # Scaling & sequence preparation
+│   ├── inventory_simulator.py# Periodic-review inventory engine + policies
+│   └── mlflow_manager.py     # MLflow utilities
+├── tests/                     # Unit tests
+├── .streamlit/config.toml     # Theme configuration
+├── config.py                  # System configuration
+├── docker-compose.yml         # Docker configuration
+├── requirements.txt           # pip dependencies
+└── README.md                  # Documentation
 
 ## ⚙️ Configuration
 
@@ -107,28 +111,42 @@ DRL Parameters:
 
 ## 📊 Dashboard Features
 
-1. Model Configuration
-   - Adjust LSTM architecture
-   - Configure training parameters
-   - Set optimization constraints
+**📈 Sales Forecast**
+- Demand history with rolling average
+- MLflow experiment tracking (history table, metric trends, run management)
+- Configurable LSTM architecture and one-click training
+- Actual vs. predicted plot and training-loss curve
 
-2. Training Interface
-   - Real-time training progress
-   - Performance metrics visualization
-   - Model comparison tools
+**🏭 Inventory Optimization**
+- Base-stock simulation over historical demand
+- KPIs: service level, average inventory, stockout periods, total cost
+- Inventory-position chart (on-hand, demand, order-up-to level) and orders placed
 
-3. Results Analysis
-   - Sales forecasting accuracy
-   - Inventory level optimization
-   - Cost breakdown analysis
+**💰 Cost Analysis**
+- Side-by-side base-stock vs. forecast-driven policy comparison
+- Holding / stockout / ordering cost breakdown and total savings
+- Summary metrics table
+
+All parameters (holding cost, stockout penalty, ordering cost, lead time, target
+service level) are adjustable from the sidebar and flow through every tab.
 
 ## 🧪 Testing
 
-Run all tests:
-docker-compose run tests
+Run all tests locally:
 
-Run specific test:
-docker-compose run tests pytest tests/test_forecasting.py
+    python run_tests.py
+
+Or with pytest:
+
+    pytest tests/
+
+In Docker:
+
+    docker-compose run tests
+
+The pure-Python tests (data processing, inventory simulation, base-stock policy)
+run without TensorFlow or PyTorch installed; the LSTM and DRL tests skip
+gracefully when those libraries are unavailable.
 
 ## 📈 Performance
 
@@ -159,16 +177,11 @@ mypy .
 
 Distributed under the MIT License. See LICENSE for more information.
 
-## 📧 Contact
-
-Your Name - your.email@example.com
-Project Link: https://github.com/yourusername/inventory-management-ml
-
 ## 🙏 Acknowledgments
 
 - TensorFlow - Deep Learning Framework
+- PyTorch - Reinforcement Learning
 - MLflow - Experiment Tracking
 - Streamlit - Interactive Dashboard
+- Plotly - Charting
 - Docker - Containerization
-
-For detailed documentation of each component, please refer to the docs/ directory in the repository. 

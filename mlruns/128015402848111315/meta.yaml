@@ -1,6 +1,0 @@
-artifact_location: file:///app/mlruns/128015402848111315
-creation_time: 1738572221446
-experiment_id: '128015402848111315'
-last_update_time: 1738572221446
-lifecycle_stage: active
-name: test_experiment

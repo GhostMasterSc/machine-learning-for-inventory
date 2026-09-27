@@ -9,8 +9,19 @@ class TestSalesForecaster(unittest.TestCase):
         self.forecaster = SalesForecaster(self.config)
         
     def test_model_structure(self):
-        """Test if the model is properly initialized with correct layers"""
-        self.assertEqual(len(self.forecaster.model.layers), 5)  # 2 LSTM, 2 Dropout, 1 Dense
+        """Test the model has the expected layer composition.
+
+        With ``num_lstm_layers=2`` we expect 2 LSTM, 2 Dropout and 1 Dense
+        layer. We count by type rather than a fixed total, since whether the
+        functional ``Input`` layer appears in ``model.layers`` varies by Keras
+        version.
+        """
+        from tensorflow.keras.layers import LSTM, Dense, Dropout
+
+        layers = self.forecaster.model.layers
+        self.assertEqual(sum(isinstance(l, LSTM) for l in layers), 2)
+        self.assertEqual(sum(isinstance(l, Dropout) for l in layers), 2)
+        self.assertEqual(sum(isinstance(l, Dense) for l in layers), 1)
         
     def test_prediction_shape(self):
         """Test if model predictions have correct shape"""

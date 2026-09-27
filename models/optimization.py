@@ -1,12 +1,34 @@
-import torch
-import torch.nn as nn
-import torch.optim as optim
-import numpy as np
-from collections import deque
 import random
+from collections import deque
 
-class DRLAgent(nn.Module):
+import numpy as np
+
+# PyTorch is only needed for the DRL agent. Import it lazily so the pure-numpy
+# BaseStockPolicy (and its tests) remain usable in lightweight environments
+# without a torch install.
+try:
+    import torch
+    import torch.nn as nn
+    import torch.optim as optim
+    _TORCH_AVAILABLE = True
+except ImportError:  # pragma: no cover - depends on environment
+    _TORCH_AVAILABLE = False
+    nn = None
+
+
+if _TORCH_AVAILABLE:
+    _DRLBase = nn.Module
+else:
+    _DRLBase = object
+
+
+class DRLAgent(_DRLBase):
     def __init__(self, config):
+        if not _TORCH_AVAILABLE:
+            raise ImportError(
+                "PyTorch is required to use DRLAgent. Install it with "
+                "`pip install torch`."
+            )
         super(DRLAgent, self).__init__()
         self.config = config
         
@@ -39,17 +61,19 @@ class DRLAgent(nn.Module):
         
         batch = random.sample(self.memory, self.config['batch_size'])
         states, actions, rewards, next_states = zip(*batch)
-        
-        states = torch.FloatTensor(states)
-        actions = torch.FloatTensor(actions)
-        rewards = torch.FloatTensor(rewards)
-        next_states = torch.FloatTensor(next_states)
-        
+
+        # Convert to contiguous arrays first: building a tensor directly from a
+        # tuple of ndarrays is slow and raises a warning in recent PyTorch.
+        states = torch.as_tensor(np.asarray(states), dtype=torch.float32)
+        rewards = torch.as_tensor(np.asarray(rewards), dtype=torch.float32)
+        next_states = torch.as_tensor(np.asarray(next_states), dtype=torch.float32)
+
         current_q = self.forward(states)
-        next_q = self.forward(next_states)
-        
-        target = rewards + self.config['gamma'] * next_q.max(1)[0]
-        loss = nn.MSELoss()(current_q, target.unsqueeze(1))
+        with torch.no_grad():
+            next_q = self.forward(next_states)
+            target = rewards + self.config['gamma'] * next_q.max(1)[0]
+
+        loss = nn.MSELoss()(current_q.squeeze(1), target)
         
         self.optimizer.zero_grad()
         loss.backward()

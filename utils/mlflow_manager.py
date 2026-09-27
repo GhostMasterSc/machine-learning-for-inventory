@@ -66,46 +66,52 @@ class MLflowManager:
         mlflow.log_artifact(local_path)
         
     def get_best_run(self, metric="rmse", mode="min"):
-        """Get the best run based on a metric"""
+        """Get the best run based on a metric.
+
+        ``mlflow.search_runs`` returns a DataFrame sorted by the requested
+        metric, so the best run is simply the first row.
+        """
         runs = mlflow.search_runs(
             experiment_ids=[self.experiment_id],
-            order_by=[f"metrics.{metric} {'ASC' if mode=='min' else 'DESC'}"]
+            order_by=[f"metrics.{metric} {'ASC' if mode == 'min' else 'DESC'}"]
         )
-        return runs[0] if runs else None
-    
+        if runs is None or runs.empty:
+            return None
+        return runs.iloc[0]
+
     def delete_run(self, run_id):
         """Delete a specific run"""
         mlflow.delete_run(run_id)
-    
+
     def compare_runs_df(self, metric_list=None):
-        """Get comparison dataframe of all runs"""
+        """Get a tidy comparison DataFrame of all valid runs.
+
+        ``search_runs`` already returns a DataFrame with ``metrics.*`` and
+        ``params.*`` columns; this reshapes it into short column names and
+        drops runs missing the core metrics.
+        """
         if metric_list is None:
             metric_list = ["rmse", "mae", "mape"]
-            
+
         runs = mlflow.search_runs(experiment_ids=[self.experiment_id])
-        
-        runs_data = []
-        for run in runs:
-            # Filter out invalid runs
-            if (run.data.metrics.get('rmse', 0) <= 0 or 
-                run.data.metrics.get('mae', 0) <= 0 or
-                run.data.metrics.get('mape', 0) <= 0):
-                continue
-            
-            # Get start time from tag or run info
-            start_time = run.data.tags.get("start_time")
-            if start_time:
-                start_time = pd.to_datetime(start_time).strftime("%Y-%m-%d %H:%M:%S")
-            else:
-                # Fallback to run start time
-                start_time = pd.to_datetime(run.info.start_time/1000, unit='s').strftime("%Y-%m-%d %H:%M:%S")
-            
-            run_data = {
-                "run_id": run.info.run_id,
-                "start_time": start_time,
-                **{m: run.data.metrics.get(m, None) for m in metric_list},
-                **run.data.params
-            }
-            runs_data.append(run_data)
-            
-        return pd.DataFrame(runs_data) 
+        if runs is None or runs.empty:
+            return pd.DataFrame()
+
+        result = pd.DataFrame({"run_id": runs["run_id"]})
+        if "start_time" in runs.columns:
+            result["start_time"] = pd.to_datetime(runs["start_time"])
+        for metric in metric_list:
+            col = f"metrics.{metric}"
+            result[metric] = runs[col] if col in runs.columns else None
+
+        # Keep only runs with valid core metrics.
+        core = [m for m in ("rmse", "mae", "mape") if m in result.columns]
+        for metric in core:
+            result = result[result[metric] > 0]
+
+        # Carry over any logged parameters.
+        for col in runs.columns:
+            if col.startswith("params."):
+                result[col.replace("params.", "")] = runs.loc[result.index, col]
+
+        return result.reset_index(drop=True) 
